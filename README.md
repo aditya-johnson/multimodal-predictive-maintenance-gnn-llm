@@ -367,21 +367,24 @@ WebSocket endpoint: `wss://your-domain/ws/{machine_id}`
 
 ## 🔮 Future Enhancements
 
-### P1 - High Priority
-- [ ] Integrate PyTorch Geometric for actual GCN/GAT training
-- [ ] Real-time WebSocket sensor streaming
-- [ ] Email/SMS alerts for critical predictions
+### Completed in v2.0 ✅
+- [x] PyTorch Geometric GCN/GAT models
+- [x] Real-time WebSocket sensor streaming
+- [x] Alert notification system
+- [x] SendGrid email integration
 
 ### P2 - Medium Priority
 - [ ] User authentication system
 - [ ] Historical prediction accuracy tracking
 - [ ] Export reports to PDF
 - [ ] Mobile-responsive improvements
+- [ ] Train GNN on real failure datasets
 
 ### P3 - Future
 - [ ] Dynamic temporal graphs
 - [ ] Comparison with baseline ML models (LSTM, Random Forest)
 - [ ] Integration with industrial IoT platforms (OPC-UA, MQTT)
+- [ ] SMS alerts via Twilio
 
 ## 📄 License
 
