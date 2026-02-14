@@ -1,0 +1,155 @@
+{
+  "design_system": {
+    "theme": "dark",
+    "aesthetic": "Obsidian Control Room",
+    "description": "A high-contrast, data-dense industrial interface inspired by sci-fi HUDs and tactical control rooms. Prioritizes legibility of critical metrics against deep matte backgrounds.",
+    "typography": {
+      "font_family": {
+        "heading": "Chivo, sans-serif",
+        "body": "Inter, sans-serif",
+        "mono": "JetBrains Mono, monospace"
+      },
+      "scale": {
+        "h1": "text-4xl font-bold tracking-tight",
+        "h2": "text-3xl font-semibold tracking-tight",
+        "h3": "text-2xl font-medium",
+        "body": "text-base leading-relaxed",
+        "small": "text-sm text-muted-foreground",
+        "mono_lg": "text-lg font-mono tracking-wide",
+        "mono_base": "text-base font-mono"
+      }
+    },
+    "colors": {
+      "background": {
+        "default": "#09090b",
+        "paper": "#18181b",
+        "subtle": "#27272a"
+      },
+      "text": {
+        "primary": "#e4e4e7",
+        "secondary": "#a1a1aa",
+        "muted": "#71717a"
+      },
+      "accent": {
+        "primary": "#00f0ff",
+        "secondary": "#10b981",
+        "tertiary": "#8b5cf6"
+      },
+      "status": {
+        "success": "#10b981",
+        "warning": "#facc15",
+        "error": "#ef4444",
+        "info": "#3b82f6"
+      },
+      "border": {
+        "default": "#27272a",
+        "active": "#3f3f46"
+      }
+    },
+    "spacing": {
+      "container_padding": "p-6 md:p-8 lg:p-10",
+      "section_gap": "gap-6",
+      "component_gap": "gap-4"
+    },
+    "radius": {
+      "default": "rounded-md",
+      "small": "rounded-sm",
+      "large": "rounded-lg"
+    },
+    "shadows": {
+      "card": "0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)",
+      "glow": "0 0 15px rgba(0, 240, 255, 0.15)",
+      "glow_hover": "0 0 25px rgba(0, 240, 255, 0.25)"
+    }
+  },
+  "components": {
+    "buttons": {
+      "primary": "bg-cyan-500 text-black hover:bg-cyan-400 font-medium rounded-sm shadow-[0_0_10px_rgba(6,182,212,0.3)] transition-all",
+      "secondary": "bg-zinc-800 text-zinc-100 hover:bg-zinc-700 border border-zinc-700 rounded-sm",
+      "ghost": "hover:bg-zinc-800/50 text-zinc-400 hover:text-zinc-100",
+      "destructive": "bg-red-900/20 text-red-400 border border-red-900/50 hover:bg-red-900/40"
+    },
+    "cards": {
+      "default": "bg-zinc-950/50 border border-zinc-800/60 backdrop-blur-sm rounded-md",
+      "interactive": "hover:border-cyan-500/30 transition-colors duration-300 cursor-pointer"
+    },
+    "inputs": {
+      "default": "bg-zinc-900/50 border-zinc-800 focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/20 rounded-sm font-mono text-sm"
+    },
+    "badges": {
+      "success": "bg-emerald-950/30 text-emerald-400 border border-emerald-900/50 px-2 py-0.5 text-xs font-mono uppercase tracking-wider rounded-sm",
+      "warning": "bg-yellow-950/30 text-yellow-400 border border-yellow-900/50 px-2 py-0.5 text-xs font-mono uppercase tracking-wider rounded-sm",
+      "error": "bg-red-950/30 text-red-400 border border-red-900/50 px-2 py-0.5 text-xs font-mono uppercase tracking-wider rounded-sm",
+      "neutral": "bg-zinc-800/50 text-zinc-400 border border-zinc-700/50 px-2 py-0.5 text-xs font-mono uppercase tracking-wider rounded-sm"
+    }
+  },
+  "layout_strategies": {
+    "dashboard_grid": "grid grid-cols-1 md:grid-cols-12 gap-4 auto-rows-min",
+    "sidebar_layout": "flex h-screen overflow-hidden bg-zinc-950",
+    "content_area": "flex-1 overflow-y-auto p-6 md:p-8"
+  },
+  "visual_assets": {
+    "images": [
+      {
+        "category": "machinery",
+        "url": "https://images.unsplash.com/photo-1701448149957-b96dbd1926ff?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMzV8MHwxfHNlYXJjaHwxfHxpbmR1c3RyaWFsJTIwbWFjaGluZXJ5JTIwZmFjdG9yeSUyMHR1cmJpbmUlMjByb2JvdGljJTIwYXJtfGVufDB8fHx8MTc3MTA4Njc3OXww&ixlib=rb-4.1.0&q=85",
+        "description": "Close up of working machinery"
+      },
+      {
+        "category": "machinery",
+        "url": "https://images.unsplash.com/photo-1696005686144-36d7ad4518bd?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMzV8MHwxfHNlYXJjaHwyfHxpbmR1c3RyaWFsJTIwbWFjaGluZXJ5JTIwZmFjdG9yeSUyMHR1cmJpbmUlMjByb2JvdGljJTIwYXJtfGVufDB8fHx8MTc3MTA4Njc3OXww&ixlib=rb-4.1.0&q=85",
+        "description": "Metal object detail"
+      },
+      {
+        "category": "machinery",
+        "url": "https://images.unsplash.com/photo-1649715985977-ba96091a2b4e?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMzV8MHwxfHNlYXJjaHwzfHxpbmR1c3RyaWFsJTIwbWFjaGluZXJ5JTIwZmFjdG9yeSUyMHR1cmJpbmUlMjByb2JvdGljJTIwYXJtfGVufDB8fHx8MTc3MTA4Njc3OXww&ixlib=rb-4.1.0&q=85",
+        "description": "Machine on table"
+      },
+      {
+        "category": "factory_floor",
+        "url": "https://images.unsplash.com/photo-1720670996816-77883ddd4407?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMzV8MHwxfHNlYXJjaHw0fHxpbmR1c3RyaWFsJTIwbWFjaGluZXJ5JTIwZmFjdG9yeSUyMHR1cmJpbmUlMjByb2JvdGljJTIwYXJtfGVufDB8fHx8MTc3MTA4Njc3OXww&ixlib=rb-4.1.0&q=85",
+        "description": "Large machine in room"
+      },
+      {
+        "category": "server_data",
+        "url": "https://images.unsplash.com/photo-1744868562210-fffb7fa882d9?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA3MDR8MHwxfHNlYXJjaHwxfHxzZXJ2ZXIlMjByb29tJTIwZGF0YSUyMHZpc3VhbGl6YXRpb24lMjBhYnN0cmFjdCUyMG5ldHdvcmt8ZW58MHx8fHwxNzcxMDg2Nzk5fDA&ixlib=rb-4.1.0&q=85",
+        "description": "Fibre optic cables"
+      },
+      {
+        "category": "server_data",
+        "url": "https://images.unsplash.com/photo-1680992046626-418f7e910589?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA3MDR8MHwxfHNlYXJjaHwyfHxzZXJ2ZXIlMjByb29tJTIwZGF0YSUyMHZpc3VhbGl6YXRpb24lMjBhYnN0cmFjdCUyMG5ldHdvcmt8ZW58MHx8fHwxNzcxMDg2Nzk5fDA&ixlib=rb-4.1.0&q=85",
+        "description": "Rack of electronic equipment"
+      }
+    ],
+    "icons": "lucide-react"
+  },
+  "libraries": {
+    "charts": "recharts",
+    "graph_viz": "react-force-graph-2d or reactflow",
+    "animations": "framer-motion",
+    "icons": "lucide-react",
+    "date_handling": "date-fns",
+    "ui_components": "shadcn/ui"
+  },
+  "instructions_to_main_agent": [
+    "Implement a 'dark mode only' strategy. Force the 'dark' class on the html element.",
+    "Use 'Chivo' for all headings to give a technical, industrial feel. Use 'JetBrains Mono' for all data points, sensor readings, and logs.",
+    "For the 'Equipment Health Dashboard', use a Bento Grid layout. The Health Score Gauge should be the dominant visual.",
+    "For 'Sensor Time-Series', use Recharts with custom tooltips that mimic a HUD overlay (semi-transparent black bg, cyan borders).",
+    "For 'Graph Visualization', use a force-directed graph to show sensor dependencies. Nodes should be colored by their health status (Green/Yellow/Red).",
+    "Ensure all cards have a subtle 1px border (zinc-800) and a very faint glow on hover.",
+    "Do not use standard scrollbars. Customize them to be thin and dark (zinc-800 track, zinc-600 thumb).",
+    "Use the provided image URLs for the 'Machine Selector' thumbnails and 'Maintenance Log' headers.",
+    "Add 'data-testid' to all interactive elements for testing."
+  ],
+  "universal_guidelines": [
+    "Avoid generic centered layouts. Use asymmetry to create tension and interest.",
+    "Create depth through layered design elements with z-index hierarchy.",
+    "Use glass-morphism effects with backdrop filters (12-24px blur) for overlays and sticky headers.",
+    "Do NOT apply universal transitions (e.g., 'transition: all'). Animate specific properties.",
+    "Never use AI assistant emojis. Use Lucide icons.",
+    "Prioritize using pre-existing components from src/components/ui.",
+    "Components MUST use named exports.",
+    "Pages MUST use default exports."
+  ]
+}
