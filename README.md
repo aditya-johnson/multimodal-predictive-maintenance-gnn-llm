@@ -2,6 +2,13 @@
 
 A full-stack industrial monitoring dashboard that combines **Graph Neural Networks (GNN)** and **NLP embeddings** for advanced failure prediction in industrial machinery.
 
+## 🆕 Version 2.0 Features
+
+- **PyTorch Geometric GNN** - Real GCN and GAT models for sensor dependency learning
+- **Real-time WebSocket Streaming** - Live sensor updates every 5 seconds
+- **Alert System** - Automatic alerts when health drops below thresholds
+- **Email Notifications** - SendGrid integration for critical alerts (optional)
+
 ![Dashboard Preview](https://images.unsplash.com/photo-1701448149957-b96dbd1926ff?w=800)
 
 ## 🎯 Problem Statement
@@ -291,10 +298,12 @@ JSON format:
 | FastAPI | REST API framework |
 | MongoDB + Motor | Async database |
 | PyTorch | Deep learning framework |
+| PyTorch Geometric | GNN models (GCN, GAT) |
 | scipy | Statistical computations |
 | networkx | Graph algorithms |
 | scikit-learn | ML utilities |
-| sentence-transformers | NLP embeddings (ready for integration) |
+| sentence-transformers | NLP embeddings |
+| SendGrid | Email notifications |
 
 ### Frontend
 | Library | Purpose |
@@ -304,8 +313,57 @@ JSON format:
 | Recharts | Time-series charts |
 | react-force-graph-2d | Graph visualization |
 | Framer Motion | Animations |
+| socket.io-client | WebSocket connection |
 | Lucide React | Icons |
 | shadcn/ui | UI components |
+
+## 🔔 Alert System
+
+The system monitors machine health and triggers alerts based on configurable thresholds:
+
+| Health Score | Risk Level | Action |
+|--------------|------------|--------|
+| > 70% | Healthy | No alert |
+| 40-70% | Warning | Yellow alert |
+| < 40% | Critical | Red alert + optional email |
+
+### Configuring Alerts
+
+1. Go to **Alerts** tab in sidebar
+2. Click **Alert Settings**
+3. Configure:
+   - Email notifications toggle
+   - Email recipients list
+   - Critical threshold (default: 40%)
+   - Warning threshold (default: 70%)
+
+### Email Alerts (Optional)
+
+To enable email alerts, add to `/app/backend/.env`:
+```bash
+SENDGRID_API_KEY=your_sendgrid_api_key
+SENDER_EMAIL=alerts@yourdomain.com
+```
+
+## 🌐 WebSocket Real-time Streaming
+
+The system streams live sensor data every 5 seconds when viewing a machine:
+
+```
+Live Sensors → WebSocket → Buffer
+                          ↓
+                  Graph Builder
+                          ↓
+                      GNN
+                          ↓
+                 Fusion + NLP
+                          ↓
+                 Health Score
+                          ↓
+        Dashboard + Alert Engine
+```
+
+WebSocket endpoint: `wss://your-domain/ws/{machine_id}`
 
 ## 🔮 Future Enhancements
 
