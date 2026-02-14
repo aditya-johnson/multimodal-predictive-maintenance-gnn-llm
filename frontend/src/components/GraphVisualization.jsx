@@ -130,15 +130,20 @@ export const GraphVisualization = ({ selectedMachine, API }) => {
     const start = link.source;
     const end = link.target;
 
-    // Draw link with gradient
-    const gradient = ctx.createLinearGradient(start.x, start.y, end.x, end.y);
-    gradient.addColorStop(0, `${SENSOR_COLORS[start.id] || "#00f0ff"}80`);
-    gradient.addColorStop(1, `${SENSOR_COLORS[end.id] || "#00f0ff"}80`);
+    // Check if coordinates are valid
+    if (!start || !end || 
+        typeof start.x !== 'number' || typeof start.y !== 'number' ||
+        typeof end.x !== 'number' || typeof end.y !== 'number' ||
+        !isFinite(start.x) || !isFinite(start.y) ||
+        !isFinite(end.x) || !isFinite(end.y)) {
+      return;
+    }
 
+    // Draw simple line instead of gradient to avoid canvas errors
     ctx.beginPath();
     ctx.moveTo(start.x, start.y);
     ctx.lineTo(end.x, end.y);
-    ctx.strokeStyle = gradient;
+    ctx.strokeStyle = `rgba(0, 240, 255, ${Math.min((link.weight || 0.5), 1) * 0.6})`;
     ctx.lineWidth = (link.weight || 0.5) * 3;
     ctx.stroke();
   }, []);
