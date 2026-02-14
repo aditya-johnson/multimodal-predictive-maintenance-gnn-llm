@@ -11,7 +11,8 @@ import {
   Database,
   Cpu,
   AlertTriangle,
-  CheckCircle2
+  CheckCircle2,
+  Bell
 } from "lucide-react";
 import { Button } from "./ui/button";
 import { ScrollArea } from "./ui/scroll-area";
@@ -22,7 +23,8 @@ const navItems = [
   { id: "sensors", label: "Sensor Data", icon: LineChart },
   { id: "prediction", label: "Failure Prediction", icon: Activity },
   { id: "graph", label: "Sensor Graph", icon: Network },
-  { id: "logs", label: "Maintenance Logs", icon: FileText }
+  { id: "logs", label: "Maintenance Logs", icon: FileText },
+  { id: "alerts", label: "Alerts", icon: Bell }
 ];
 
 const getRiskColor = (level) => {
@@ -50,7 +52,8 @@ export const Sidebar = ({
   selectedMachine, 
   setSelectedMachine,
   onSeedDemo,
-  loading 
+  loading,
+  alertCount = 0
 }) => {
   const [collapsed, setCollapsed] = useState(false);
 
@@ -90,11 +93,12 @@ export const Sidebar = ({
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = activeTab === item.id;
+          const showBadge = item.id === "alerts" && alertCount > 0;
           return (
             <Button
               key={item.id}
               variant={isActive ? "secondary" : "ghost"}
-              className={`w-full justify-start mb-1 ${
+              className={`w-full justify-start mb-1 relative ${
                 isActive 
                   ? "bg-cyan-500/10 text-cyan-400 border border-cyan-500/20" 
                   : "text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/50"
@@ -102,8 +106,13 @@ export const Sidebar = ({
               onClick={() => setActiveTab(item.id)}
               data-testid={`nav-${item.id}`}
             >
-              <Icon className={`w-4 h-4 ${collapsed ? "" : "mr-3"}`} />
+              <Icon className={`w-4 h-4 ${collapsed ? "" : "mr-3"} ${showBadge ? "text-red-400" : ""}`} />
               {!collapsed && <span className="text-sm">{item.label}</span>}
+              {showBadge && (
+                <span className={`absolute ${collapsed ? "top-0 right-0" : "right-2"} bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-mono`}>
+                  {alertCount > 9 ? "9+" : alertCount}
+                </span>
+              )}
             </Button>
           );
         })}
