@@ -41,7 +41,11 @@
 }
 
 html {
-    @apply dark;
+    @apply bg-zinc-950 text-zinc-100;
+}
+
+html.dark {
+    @apply bg-zinc-950 text-zinc-100;
 }
 
 body {
