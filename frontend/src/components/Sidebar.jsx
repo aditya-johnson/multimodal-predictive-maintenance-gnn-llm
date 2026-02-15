@@ -13,7 +13,8 @@ import {
   AlertTriangle,
   CheckCircle2,
   Bell,
-  Building2
+  Building2,
+  BarChart3
 } from "lucide-react";
 import { Button } from "./ui/button";
 import { ScrollArea } from "./ui/scroll-area";
