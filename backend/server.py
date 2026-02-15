@@ -1113,6 +1113,7 @@ async def get_model_comparison():
                 "early_warning_lead_time": data.get("comparison_metrics", {}).get("early_warning_lead_time", {}),
                 "comparison_summary": data.get("comparison_metrics", {}).get("comparison_summary", {}),
                 "roi_metrics": data.get("roi_metrics", {}),
+                "training_history": data.get("training_history", {}),
                 "training_timestamp": data.get("timestamp"),
                 "training_config": data.get("training_config", {})
             }
