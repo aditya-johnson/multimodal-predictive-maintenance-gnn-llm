@@ -349,6 +349,10 @@ function App() {
             API={API}
           />
         );
+      case "comparison":
+        return (
+          <ComparisonDashboard API={API} />
+        );
       default:
         return null;
     }
