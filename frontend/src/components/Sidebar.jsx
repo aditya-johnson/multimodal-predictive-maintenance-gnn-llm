@@ -183,20 +183,22 @@ export const Sidebar = ({
       )}
 
       {/* Seed Demo Button */}
-      <div className="p-3 border-t border-zinc-800/60">
-        <Button
-          variant="outline"
-          className={`w-full border-zinc-700 text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100 ${
-            collapsed ? "px-2" : ""
-          }`}
-          onClick={onSeedDemo}
-          disabled={loading}
-          data-testid="seed-demo-btn"
-        >
-          <Database className={`w-4 h-4 ${collapsed ? "" : "mr-2"}`} />
-          {!collapsed && (loading ? "Loading..." : "Load Demo Data")}
-        </Button>
-      </div>
+      {hasOrg && onSeedDemo && (
+        <div className="p-3 border-t border-zinc-800/60">
+          <Button
+            variant="outline"
+            className={`w-full border-zinc-700 text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100 ${
+              collapsed ? "px-2" : ""
+            }`}
+            onClick={onSeedDemo}
+            disabled={loading}
+            data-testid="seed-demo-btn"
+          >
+            <Database className={`w-4 h-4 ${collapsed ? "" : "mr-2"}`} />
+            {!collapsed && (loading ? "Loading..." : "Load Demo Data")}
+          </Button>
+        </div>
+      )}
     </motion.aside>
   );
 };
