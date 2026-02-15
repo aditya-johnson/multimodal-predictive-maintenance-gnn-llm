@@ -79,6 +79,7 @@ const MetricCard = ({ title, value, subtitle, icon: Icon, trend, color = "cyan" 
 
 export const ComparisonDashboard = ({ API }) => {
   const [comparisonData, setComparisonData] = useState(null);
+  const [trainingHistory, setTrainingHistory] = useState(null);
   const [loading, setLoading] = useState(true);
   const [roiInputs, setRoiInputs] = useState({
     downtimeCostPerHour: 10000,
@@ -100,9 +101,19 @@ export const ComparisonDashboard = ({ API }) => {
       if (response.data.roi_metrics) {
         setCalculatedROI(response.data.roi_metrics);
       }
+      // Extract training history if available
+      if (response.data.training_history) {
+        const history = response.data.training_history;
+        const historyData = history.train_loss.map((loss, i) => ({
+          epoch: i + 1,
+          loss: parseFloat(loss.toFixed(2)),
+          train_acc: parseFloat((history.train_acc[i] * 100).toFixed(1)),
+          val_f1: parseFloat((history.val_f1[i] * 100).toFixed(1))
+        }));
+        setTrainingHistory(historyData);
+      }
     } catch (error) {
       console.error("Error fetching comparison data:", error);
-      // Use mock data if endpoint not available
       setComparisonData(getMockData());
     } finally {
       setLoading(false);
