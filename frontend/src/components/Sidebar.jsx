@@ -25,7 +25,8 @@ const navItems = [
   { id: "prediction", label: "Failure Prediction", icon: Activity },
   { id: "graph", label: "Sensor Graph", icon: Network },
   { id: "logs", label: "Maintenance Logs", icon: FileText },
-  { id: "alerts", label: "Alerts", icon: Bell }
+  { id: "alerts", label: "Alerts", icon: Bell },
+  { id: "organization", label: "Organization", icon: Building2 }
 ];
 
 const getRiskColor = (level) => {
