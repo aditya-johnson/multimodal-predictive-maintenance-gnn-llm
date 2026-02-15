@@ -1,0 +1,154 @@
+{
+  "training_config": {
+    "epochs": 5,
+    "batch_size": 32,
+    "learning_rate": 0.001,
+    "window_size": 30,
+    "hidden_channels": 64,
+    "device": "cpu",
+    "test_mode": true
+  },
+  "final_metrics": {
+    "accuracy": 0.6216216216216216,
+    "precision": 0.7845786963434023,
+    "recall": 0.6216216216216216,
+    "f1": 0.6595987740317636,
+    "rul_mae": 86.7196909777216,
+    "confusion_matrix": [
+      [
+        40,
+        0,
+        17
+      ],
+      [
+        0,
+        0,
+        11
+      ],
+      [
+        0,
+        0,
+        6
+      ]
+    ],
+    "roc_auc": 0.9650932445050091
+  },
+  "comparison_metrics": {
+    "gnn": {
+      "model": "GNN Fusion",
+      "accuracy": 0.6216216216216216,
+      "precision": 0.7845786963434023,
+      "recall": 0.6216216216216216,
+      "f1": 0.6595987740317636,
+      "false_positive_rate": 0.22972972972972974,
+      "missed_failure_rate": 0.0,
+      "critical_detection_rate": 1.0,
+      "confusion_matrix": [
+        [
+          40,
+          0,
+          17
+        ],
+        [
+          0,
+          0,
+          11
+        ],
+        [
+          0,
+          0,
+          6
+        ]
+      ]
+    },
+    "threshold": {
+      "model": "Threshold",
+      "accuracy": 0.7702702702702703,
+      "precision": 0.5933162892622352,
+      "recall": 0.7702702702702703,
+      "f1": 0.6703115329069528,
+      "false_positive_rate": 0.0,
+      "missed_failure_rate": 1.0,
+      "critical_detection_rate": 0.0,
+      "confusion_matrix": [
+        [
+          57,
+          0,
+          0
+        ],
+        [
+          11,
+          0,
+          0
+        ],
+        [
+          6,
+          0,
+          0
+        ]
+      ]
+    },
+    "early_warning_lead_time": {
+      "gnn": 10.5,
+      "threshold": 0,
+      "improvement": 10.5
+    },
+    "comparison_summary": {
+      "accuracy_improvement": -0.14864864864864868,
+      "f1_improvement": -0.010712758875189188,
+      "false_positive_reduction": -0.22972972972972974,
+      "missed_failure_reduction": 1.0
+    }
+  },
+  "roi_metrics": {
+    "assumptions": {
+      "downtime_cost_per_hour": 10000,
+      "maintenance_cost": 2000,
+      "machines_monitored": 100,
+      "avg_failures_per_year": 5,
+      "avg_unplanned_downtime_hours": 8,
+      "planned_maintenance_downtime_hours": 2
+    },
+    "threshold_annual_cost": {
+      "downtime_cost": 40000000.0,
+      "false_alarm_cost": 0.0,
+      "total": 40000000.0
+    },
+    "gnn_annual_cost": {
+      "downtime_cost": 0.0,
+      "false_alarm_cost": 503108.10810810805,
+      "total": 503108.10810810805
+    },
+    "annual_savings": {
+      "downtime_prevented": 40000000.0,
+      "false_alarm_reduction": -503108.10810810805,
+      "early_warning_bonus": 30000000.0,
+      "total": 69496891.8918919
+    },
+    "roi_percentage": 173.74222538617408
+  },
+  "training_history": {
+    "train_loss": [
+      86.81562652587891,
+      87.11699905395508,
+      87.86199493408203,
+      84.53111114501954,
+      83.71112823486328
+    ],
+    "train_acc": [
+      0.15100671140939598,
+      0.3389261744966443,
+      0.5671140939597316,
+      0.6476510067114094,
+      0.6711409395973155
+    ],
+    "val_f1": [
+      0.012162162162162161,
+      0.20311850311850313,
+      0.48736741175765574,
+      0.6076968272620447,
+      0.6595987740317636
+    ]
+  },
+  "timestamp": "2026-02-15T06:57:07.330416"
+}
