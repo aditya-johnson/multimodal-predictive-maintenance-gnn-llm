@@ -12,7 +12,8 @@ import {
   Cpu,
   AlertTriangle,
   CheckCircle2,
-  Bell
+  Bell,
+  Building2
 } from "lucide-react";
 import { Button } from "./ui/button";
 import { ScrollArea } from "./ui/scroll-area";
