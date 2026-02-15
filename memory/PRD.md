@@ -10,7 +10,7 @@ Build a Multimodal Predictive Maintenance system using GNN + LLM for industrial 
 - **Theme**: Dark industrial monitoring theme
 - **Authentication**: JWT-based custom auth (email/password)
 - **Dataset**: NASA CMAPSS-style data generated
-- **Multi-tenancy**: Basic - users see only their own machines
+- **Multi-tenancy**: Organizations model with RBAC
 
 ## User Personas
 1. **Industrial Engineers** - Monitor equipment health, analyze trends
@@ -28,6 +28,9 @@ Build a Multimodal Predictive Maintenance system using GNN + LLM for industrial 
 - [x] Multi-tenant data isolation
 - [x] Real-time WebSocket streaming
 - [x] Alert notification system
+- [x] Role-Based Access Control (Admin/Operator/Viewer)
+- [x] Organizations model for team management
+- [x] PDF Report Generation
 
 ## Architecture
 - **Backend**: FastAPI + MongoDB + PyTorch Geometric + JWT Auth
@@ -36,15 +39,36 @@ Build a Multimodal Predictive Maintenance system using GNN + LLM for industrial 
 
 ## What's Been Implemented
 
-### Version 1.0 (Feb 14, 2026)
-- [x] Backend API with 15+ endpoints
-- [x] Data simulation engine with degradation patterns
-- [x] Correlation-based graph construction
-- [x] NLP risk keyword extraction
-- [x] Multimodal fusion prediction engine
-- [x] Dark industrial UI with 5 dashboard pages
-- [x] Health gauges, time-series charts, force-graph visualization
-- [x] CSV/JSON file upload capability
+### Version 4.0 (Feb 15, 2026)
+- [x] Role-Based Access Control (RBAC) with 3 roles:
+  - Admin: Full access (manage org, users, machines, predictions, alerts, settings)
+  - Operator: Manage machines, run predictions, manage alerts, view reports
+  - Viewer: Read-only access (view reports only)
+- [x] Organizations model for enterprise multi-tenancy:
+  - Create organizations
+  - Switch between organizations
+  - Invite members via email
+  - Accept invitations
+  - Update member roles
+  - Remove members
+- [x] PDF Report Generation with ReportLab:
+  - Machine health summary
+  - Failure predictions & RUL
+  - Sensor trends (7/30/90 days)
+  - Prediction history
+  - Maintenance log insights
+  - Recommended actions
+  - Risk classification table
+- [x] Frontend Organization Manager component
+- [x] Sidebar navigation with Organization tab
+
+### Version 3.0 (Feb 15, 2026)
+- [x] JWT-based authentication (bcrypt + PyJWT)
+- [x] User registration and login flows
+- [x] Multi-tenant data isolation
+- [x] Protected API routes with Bearer token
+- [x] NASA CMAPSS-style training data generated
+- [x] GNN model weight initialization saved
 
 ### Version 2.0 (Feb 14, 2026)
 - [x] PyTorch Geometric GCN model (3-layer, 32 hidden channels)
@@ -53,17 +77,14 @@ Build a Multimodal Predictive Maintenance system using GNN + LLM for industrial 
 - [x] Real-time WebSocket streaming (5-second intervals)
 - [x] Alert notification system with configurable thresholds
 - [x] Alert Center UI with acknowledge workflow
-- [x] SendGrid email integration (ready to enable)
 
-### Version 3.0 (Feb 15, 2026)
-- [x] JWT-based authentication (bcrypt + PyJWT)
-- [x] User registration and login flows
-- [x] Multi-tenant data isolation (user_id on all collections)
-- [x] Protected API routes with Bearer token
-- [x] Session persistence with localStorage
-- [x] NASA CMAPSS-style training data generated
-- [x] GNN model weight initialization saved
-- [x] Comprehensive README documentation
+### Version 1.0 (Feb 14, 2026)
+- [x] Backend API with 25+ endpoints
+- [x] Data simulation engine with degradation patterns
+- [x] Correlation-based graph construction
+- [x] NLP risk keyword extraction
+- [x] Multimodal fusion prediction engine
+- [x] Dark industrial UI with 7 dashboard pages
 
 ## Tech Stack Summary
 | Component | Technology |
@@ -74,7 +95,8 @@ Build a Multimodal Predictive Maintenance system using GNN + LLM for industrial 
 | GNN Models | PyTorch Geometric (GCN, GAT) |
 | NLP | Risk keyword extraction |
 | Real-time | WebSocket |
-| Email | SendGrid |
+| Email | SendGrid (ready) |
+| PDF Generation | ReportLab |
 | Frontend | React 19 |
 | Styling | Tailwind CSS |
 | Charts | Recharts |
@@ -83,7 +105,8 @@ Build a Multimodal Predictive Maintenance system using GNN + LLM for industrial 
 
 ## API Endpoints Summary
 - **Auth**: `/api/auth/register`, `/api/auth/login`, `/api/auth/me`
-- **Machines**: CRUD + simulate + predict
+- **Organizations**: CRUD, switch, invite, accept, members, roles
+- **Machines**: CRUD + simulate + predict + report
 - **Readings**: Get sensor data, upload CSV/JSON
 - **Predictions**: Run GNN, get history
 - **Logs**: Create, list with NLP analysis
@@ -93,20 +116,15 @@ Build a Multimodal Predictive Maintenance system using GNN + LLM for industrial 
 ## Prioritized Backlog
 
 ### P0 (Critical) - COMPLETED ✅
-- All core features implemented
+- All core features including RBAC, Organizations, PDF Reports
 
-### P1 (High Priority) - COMPLETED ✅
-- PyTorch Geometric GNN models
-- Real-time WebSocket streaming
-- Alert notification system
-- JWT authentication
-- Multi-tenant support
-
-### P2 (Medium Priority)
+### P1 (High Priority)
 - [ ] Train GNN on full NASA CMAPSS dataset (requires GPU)
 - [ ] Historical prediction accuracy tracking
-- [ ] Export reports to PDF
-- [ ] Role-based access control (Admin/Operator/Viewer)
+
+### P2 (Medium Priority)
+- [ ] Enhanced PDF reports with charts
+- [ ] Email notifications via SendGrid
 
 ### P3 (Future)
 - [ ] Dynamic temporal graphs
@@ -116,18 +134,12 @@ Build a Multimodal Predictive Maintenance system using GNN + LLM for industrial 
 - [ ] Mobile-responsive improvements
 
 ## Next Tasks
-1. Deploy to production environment
-2. Train GNN models on real NASA CMAPSS data with GPU
-3. Add role-based access for team collaboration
-4. Implement PDF report generation
-5. Add prediction accuracy tracking over time
+1. Train GNN models on real NASA CMAPSS data with GPU
+2. Configure SendGrid for email alerts
+3. Add prediction accuracy tracking over time
+4. Enhance PDF reports with embedded charts
 
-## Files Modified in v3.0
-- `/app/backend/server.py` - Complete rewrite with JWT auth + multi-tenant
-- `/app/backend/gnn_training.py` - GNN training script
-- `/app/backend/data/train_FD001.csv` - CMAPSS-style training data
-- `/app/backend/models/gcn_cmapss.pt` - GCN weights
-- `/app/backend/models/gat_cmapss.pt` - GAT weights
-- `/app/frontend/src/App.js` - Auth flow integration
-- `/app/frontend/src/components/AuthPage.jsx` - Login/Register UI
-- `/app/README.md` - Comprehensive documentation
+## MOCKED Components
+- **GNN Models**: Using initialized weights, not trained on real CMAPSS dataset
+- **Sensor Data**: Simulated degradation patterns, not real IoT data
+- **Email Alerts**: SendGrid integration present but requires API key
