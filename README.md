@@ -2,141 +2,309 @@
 
 A full-stack industrial monitoring dashboard that combines **Graph Neural Networks (GNN)** and **NLP embeddings** for advanced failure prediction in industrial machinery.
 
-## 🆕 Version 2.0 Features
+## 🆕 Version 3.0 Features
 
-- **PyTorch Geometric GNN** - Real GCN and GAT models for sensor dependency learning
+- **JWT Authentication** - Secure email/password registration and login
+- **Multi-tenant Support** - Users see only their own machines and data
+- **PyTorch Geometric GNN** - Real GCN and GAT models trained on CMAPSS data
 - **Real-time WebSocket Streaming** - Live sensor updates every 5 seconds
-- **Alert System** - Automatic alerts when health drops below thresholds
-- **Email Notifications** - SendGrid integration for critical alerts (optional)
+- **Alert System** - Automatic alerts with configurable thresholds
+- **SendGrid Email Integration** - Optional email notifications for critical alerts
 
-![Dashboard Preview](https://images.unsplash.com/photo-1701448149957-b96dbd1926ff?w=800)
+---
+
+## 📋 Table of Contents
+
+1. [Problem Statement](#-problem-statement)
+2. [Solution Architecture](#-solution-architecture)
+3. [Features](#-features)
+4. [Tech Stack](#-tech-stack)
+5. [Authentication](#-authentication)
+6. [GNN Models](#-gnn-models)
+7. [Alert System](#-alert-system)
+8. [API Reference](#-api-reference)
+9. [Getting Started](#-getting-started)
+10. [Data Formats](#-data-formats)
+
+---
 
 ## 🎯 Problem Statement
 
 Industrial machines (turbines, motors, compressors, CNC machines) generate massive sensor data. Traditional predictive maintenance approaches have limitations:
 
-- **Ignores sensor relationships** - Sensors don't work independently (vibration affects temperature, pressure affects RPM)
-- **No relational modeling** - Traditional ML treats data as flat tables
-- **Text data unused** - Maintenance logs contain valuable insights like "Abnormal bearing noise"
-- **Poor contextual reasoning** - Models can't interpret semantic risk signals
+| Traditional Approach | Limitation |
+|---------------------|------------|
+| LSTM / RNN | Ignores sensor relationships |
+| CNN anomaly detection | No relational modeling |
+| Random Forest / XGBoost | Treats data as flat tables |
+| Rule-based systems | Misses text data insights |
 
-## 💡 Solution
+**Consequences of failure:**
+- Unplanned downtime
+- Production loss
+- Expensive repairs
+- Safety risks
 
-This system implements a **Multimodal Predictive Maintenance Framework** that combines:
+---
 
-1. **Graph Neural Networks (GNNs)** - Model sensor dependencies as a correlation graph
-2. **NLP Embeddings** - Extract risk keywords from maintenance logs
-3. **Time-series Analysis** - Track sensor degradation patterns
-4. **Multimodal Fusion** - Combine all signals for enhanced prediction accuracy
+## 🏗️ Solution Architecture
 
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                        FRONTEND (React)                          │
+├─────────────────────────────────────────────────────────────────┤
+│  Auth Page  │  Dashboard  │  Sensors  │  Prediction  │  Alerts  │
+└──────┬──────┴──────┬──────┴─────┬─────┴──────┬───────┴────┬─────┘
+       │             │            │            │            │
+       │         WebSocket    REST API    REST API    REST API
+       │             │            │            │            │
+┌──────▼─────────────▼────────────▼────────────▼────────────▼─────┐
+│                        BACKEND (FastAPI)                         │
+├─────────────────────────────────────────────────────────────────┤
+│  JWT Auth  │  GNN Engine  │  NLP Engine  │  Alert Engine        │
+│            │  (PyTorch    │  (Keyword    │  (Threshold          │
+│            │   Geometric) │   Extraction)│   + Email)           │
+└──────┬─────┴──────┬───────┴──────┬───────┴──────┬───────────────┘
+       │            │              │              │
+       ▼            ▼              ▼              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                        MongoDB                                   │
+│  users │ machines │ sensor_readings │ predictions │ alerts      │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Data Flow
 ```
 Sensor Data + Maintenance Logs
             ↓
-     Graph Construction
+     Graph Construction (Correlation Matrix)
             ↓
-    Graph Neural Network
+    Graph Neural Network (GCN + GAT ensemble)
             ↓
-      NLP Embeddings
+      NLP Embeddings (Risk keyword extraction)
             ↓
-     Multimodal Fusion
+     Multimodal Fusion (Weighted combination)
             ↓
-     Failure Prediction
+     Failure Prediction (RUL + Confidence)
+            ↓
+     Alert Engine (Threshold check + Email)
 ```
 
-## 🏗️ Architecture
+---
 
-### Backend (FastAPI + MongoDB)
+## ✨ Features
 
-```
-/app/backend/
-├── server.py          # Main API server with 15+ endpoints
-│   ├── Data Models    # Machine, SensorReading, MaintenanceLog, Prediction
-│   ├── Simulation     # Realistic degradation pattern generator
-│   ├── GNN Module     # Correlation graph construction & prediction
-│   ├── NLP Module     # Risk keyword extraction & analysis
-│   └── Fusion Engine  # Multimodal prediction combining GNN + NLP
-├── requirements.txt   # Python dependencies
-└── .env              # Environment configuration
-```
+### 1. Authentication & Multi-tenancy
+- **JWT-based auth** with bcrypt password hashing
+- **User isolation** - each user sees only their own machines
+- **Session persistence** with localStorage
+- **Protected API routes** with Bearer token
 
-### Frontend (React + Tailwind)
+### 2. Equipment Health Dashboard
+- Real-time **health score gauge** (0-100)
+- **Failure probability** percentage
+- **Risk level badges** (Healthy/Warning/Critical)
+- **Live sensor readings** with status indicators
+- **Machine grid** for quick overview
 
-```
-/app/frontend/src/
-├── App.js                          # Main application with routing
-├── components/
-│   ├── Sidebar.jsx                 # Navigation & machine selector
-│   ├── HealthDashboard.jsx         # Equipment health overview
-│   ├── SensorTimeSeries.jsx        # Interactive sensor charts
-│   ├── FailurePrediction.jsx       # RUL & prediction display
-│   ├── GraphVisualization.jsx      # Force-directed sensor graph
-│   └── MaintenanceLogs.jsx         # NLP-analyzed log entries
-└── index.css                       # Dark industrial theme styles
-```
+### 3. Sensor Time-Series Viewer
+- **Interactive Recharts** with area gradients
+- **Sensor selector** (Temperature, Pressure, Vibration, RPM)
+- **Time range slider** for data exploration
+- **Statistics cards** (Min/Avg/Max)
+- **Show All mode** to compare sensors
 
-## 🎨 UI Design
-
-The interface follows an **"Obsidian Control Room"** aesthetic - a dark industrial theme inspired by factory control rooms:
-
-| Element | Color |
-|---------|-------|
-| Background | Dark zinc (#09090b) |
-| Healthy Status | Emerald (#10b981) |
-| Warning Status | Yellow (#facc15) |
-| Critical Status | Red (#ef4444) |
-| Accent/Highlights | Cyan (#00f0ff) |
-
-**Typography:**
-- **Headings**: Chivo (technical, industrial feel)
-- **Data/Numbers**: JetBrains Mono (monospace for readings)
-- **Body**: Inter (clean readability)
-
-## 📊 Features
-
-### 1. Equipment Health Dashboard
-- **Health Score Gauge** (0-100) with animated ring
-- **Failure Probability** percentage with progress bar
-- **Risk Level Badges** (Healthy/Warning/Critical)
-- **Live Sensor Readings** with status indicators
-- **Machine Grid** for quick overview of all equipment
-
-### 2. Sensor Time-Series Viewer
-- **Interactive Charts** using Recharts with area gradients
-- **Sensor Selector** (Temperature, Pressure, Vibration, RPM)
-- **Time Range Slider** for data exploration
-- **Statistics Cards** showing Min/Avg/Max values
-- **Show All Mode** to compare all sensors simultaneously
-
-### 3. Failure Prediction Panel
+### 4. Failure Prediction Panel
 - **Remaining Useful Life (RUL)** in days
-- **Predicted Failure Date** with calendar display
-- **Confidence Score** percentage
-- **Failure Type** classification
-- **Score Breakdown**: GNN Score, NLP Score, Fusion Score
-- **Prediction History** for trend analysis
+- **Predicted failure date**
+- **Confidence score** from ensemble model
+- **Failure type** classification
+- **Score breakdown**: GCN, GAT, NLP, Fusion
 
-### 4. Sensor Dependency Graph
-- **Force-Directed Visualization** using react-force-graph-2d
-- **Sensor Nodes** colored by type (Temperature=Red, Pressure=Blue, etc.)
-- **Correlation Edges** with weight-based thickness
-- **Interactive** - click nodes for details, zoom/pan controls
-- **Graph Statistics** - node count, edge count, average correlation
+### 5. Sensor Dependency Graph
+- **Force-directed visualization** with react-force-graph-2d
+- **Sensor nodes** colored by type
+- **Correlation edges** with weight-based thickness
+- **Interactive** - click, zoom, pan
 
-### 5. Maintenance Log Insights
-- **NLP Analysis** with SentenceTransformers
-- **Risk Keyword Extraction** (abnormal, noise, leak, bearing, etc.)
-- **Risk Score** per log entry (0-100%)
-- **Keyword Cloud** showing most frequent risk indicators
-- **Severity Filtering** (Info/Warning/Error/Critical)
-- **Search** across logs, technicians, and keywords
+### 6. Maintenance Log Insights
+- **NLP keyword extraction** from log text
+- **Risk score** per log entry
+- **Keyword cloud** of frequent issues
+- **Severity filtering** and search
 
-## 🔌 API Endpoints
+### 7. Alert Center
+- **Real-time alerts** via WebSocket
+- **Configurable thresholds** (Critical < 40%, Warning < 70%)
+- **Email notifications** via SendGrid
+- **Acknowledge workflow**
+
+---
+
+## 📦 Tech Stack
+
+### Backend
+| Library | Version | Purpose |
+|---------|---------|---------|
+| FastAPI | 0.115+ | REST API framework |
+| MongoDB + Motor | 3.11+ | Async database |
+| PyTorch | 2.10+ | Deep learning |
+| PyTorch Geometric | 2.7+ | GNN models (GCN, GAT) |
+| bcrypt | 4.1+ | Password hashing |
+| PyJWT | 2.11+ | JWT authentication |
+| scipy | 1.14+ | Statistical computations |
+| SendGrid | 6.12+ | Email notifications |
+
+### Frontend
+| Library | Version | Purpose |
+|---------|---------|---------|
+| React | 19+ | UI framework |
+| Tailwind CSS | 3+ | Styling |
+| Recharts | 2.13+ | Time-series charts |
+| react-force-graph-2d | 1.26+ | Graph visualization |
+| Framer Motion | 12+ | Animations |
+| socket.io-client | 4.8+ | WebSocket |
+| Lucide React | 0.469+ | Icons |
+| shadcn/ui | - | UI components |
+
+---
+
+## 🔐 Authentication
+
+### Registration
+```bash
+POST /api/auth/register
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "password": "securepassword",
+  "name": "John Doe"
+}
+```
+
+### Login
+```bash
+POST /api/auth/login
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "password": "securepassword"
+}
+```
+
+### Response
+```json
+{
+  "access_token": "eyJhbGciOiJIUzI1NiIs...",
+  "token_type": "bearer",
+  "user": {
+    "id": "uuid",
+    "email": "user@example.com",
+    "name": "John Doe",
+    "created_at": "2024-01-01T00:00:00Z"
+  }
+}
+```
+
+### Using Protected Routes
+```bash
+curl -H "Authorization: Bearer <token>" https://api/machines
+```
+
+---
+
+## 🧠 GNN Models
+
+### Architecture
+
+#### GCN (Graph Convolutional Network)
+```python
+class SensorGCN(nn.Module):
+    def __init__(self):
+        self.conv1 = GCNConv(4, 32)    # Input: 4 sensor features
+        self.conv2 = GCNConv(32, 32)   # Hidden layer
+        self.conv3 = GCNConv(32, 32)   # Hidden layer
+        self.lin = nn.Linear(32, 3)    # Output: 3 classes
+```
+
+#### GAT (Graph Attention Network)
+```python
+class SensorGAT(nn.Module):
+    def __init__(self):
+        self.conv1 = GATConv(4, 32, heads=4)  # Multi-head attention
+        self.conv2 = GATConv(128, 32, heads=1)
+        self.lin = nn.Linear(32, 3)
+```
+
+### Graph Construction
+1. **Nodes** = Sensors (temperature, pressure, vibration, rpm)
+2. **Node Features** = [mean, std, min, max] of recent readings
+3. **Edges** = Pearson correlations > 0.2 between sensors
+4. **Edge Weights** = Correlation strength
+
+### Prediction Classes
+| Class | Label | RUL Range |
+|-------|-------|-----------|
+| 0 | Healthy | > 60 days |
+| 1 | Warning | 30-60 days |
+| 2 | Critical | < 30 days |
+
+### Ensemble Method
+```python
+ensemble_probs = (gcn_output + gat_output) / 2
+risk_score = ensemble[1] * 0.3 + ensemble[2] * 0.7
+```
+
+---
+
+## 🔔 Alert System
+
+### Threshold Configuration
+| Health Score | Risk Level | Action |
+|--------------|------------|--------|
+| > 70% | Healthy | No alert |
+| 40-70% | Warning | Yellow alert |
+| < 40% | Critical | Red alert + Email |
+
+### Alert Settings API
+```bash
+PUT /api/alert-settings
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "email_enabled": true,
+  "email_recipients": ["engineer@company.com"],
+  "critical_threshold": 40,
+  "warning_threshold": 70
+}
+```
+
+### Email Notifications (Optional)
+Add to `/app/backend/.env`:
+```bash
+SENDGRID_API_KEY=SG.your_key_here
+SENDER_EMAIL=alerts@yourdomain.com
+```
+
+---
+
+## 📡 API Reference
+
+### Authentication
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/auth/register` | Create account |
+| POST | `/api/auth/login` | Login |
+| GET | `/api/auth/me` | Get current user |
 
 ### Machines
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | `/api/machines` | List all machines |
-| POST | `/api/machines` | Create new machine |
+| GET | `/api/machines` | List user's machines |
+| POST | `/api/machines` | Create machine |
 | GET | `/api/machines/{id}` | Get machine details |
 | DELETE | `/api/machines/{id}` | Delete machine |
 
@@ -144,98 +312,42 @@ The interface follows an **"Obsidian Control Room"** aesthetic - a dark industri
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | GET | `/api/machines/{id}/readings` | Get sensor readings |
-| POST | `/api/machines/{id}/simulate` | Generate simulated data |
+| POST | `/api/machines/{id}/simulate` | Generate demo data |
 | GET | `/api/machines/{id}/sensor-graph` | Get correlation graph |
 
 ### Predictions
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| POST | `/api/machines/{id}/predict` | Run multimodal prediction |
-| GET | `/api/machines/{id}/predictions` | Get prediction history |
+| POST | `/api/machines/{id}/predict` | Run GNN prediction |
+| GET | `/api/machines/{id}/predictions` | Get history |
 
 ### Maintenance Logs
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| POST | `/api/maintenance-logs` | Create log (with NLP analysis) |
-| GET | `/api/machines/{id}/maintenance-logs` | Get logs for machine |
+| POST | `/api/maintenance-logs` | Create log |
+| GET | `/api/machines/{id}/maintenance-logs` | Get logs |
+
+### Alerts
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/alerts` | Get alerts |
+| POST | `/api/alerts/{id}/acknowledge` | Acknowledge |
+| GET | `/api/alert-settings` | Get settings |
+| PUT | `/api/alert-settings` | Update settings |
 
 ### Utilities
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | POST | `/api/seed-demo` | Load demo data |
-| POST | `/api/upload` | Upload CSV/JSON sensor data |
-| GET | `/api/dashboard/summary` | Get overall statistics |
+| POST | `/api/upload` | Upload CSV/JSON |
+| GET | `/api/dashboard/summary` | Get stats |
 
-## 🧠 How the ML Pipeline Works
+### WebSocket
+| Endpoint | Description |
+|----------|-------------|
+| `ws://host/ws/{machine_id}` | Real-time sensor stream |
 
-### 1. Data Simulation
-```python
-def generate_degradation_pattern(days):
-    # Exponential degradation with noise
-    degradation = 1 - np.exp(-3 * (x ** 2))
-    noise = np.random.normal(0, 0.02, days)
-    return degradation + noise
-```
-
-Simulates realistic run-to-failure trajectories with:
-- Gradual sensor degradation
-- Correlated sensor changes
-- Random anomaly spikes (2% probability scaled by degradation)
-
-### 2. Graph Construction
-```python
-def build_sensor_correlation_graph(readings):
-    # Calculate Pearson correlations between sensors
-    for each sensor pair:
-        correlation = pearsonr(sensor1_data, sensor2_data)
-        if abs(correlation) > 0.3:  # Significant correlation
-            add_edge(sensor1, sensor2, weight=correlation)
-```
-
-Creates a graph where:
-- **Nodes** = Sensors (temperature, pressure, vibration, rpm)
-- **Edges** = Correlations between sensors
-- **Edge Weights** = Correlation strength
-
-### 3. GNN Prediction
-```python
-def gnn_predict(graph, readings):
-    # Extract graph features
-    total_edge_weight = sum(edge weights)
-    node_variance = sum(node variances)
-    
-    # Sensor trend analysis
-    temp_trend = recent_temp / initial_temp
-    vib_trend = recent_vib / initial_vib
-    
-    # Combine for prediction score
-    score = 0.3*edge_weight + 0.2*variance + 0.25*temp_trend + 0.25*vib_trend
-```
-
-### 4. NLP Analysis
-```python
-RISK_KEYWORDS = ["abnormal", "noise", "leak", "vibration", "overheating", 
-                 "failure", "broken", "crack", "worn", "bearing", ...]
-
-def analyze_maintenance_log(text):
-    found_keywords = [kw for kw in RISK_KEYWORDS if kw in text.lower()]
-    risk_score = min(1.0, len(found_keywords) * 0.15)
-    return found_keywords, risk_score
-```
-
-### 5. Multimodal Fusion
-```python
-def multimodal_fusion_predict(gnn_score, nlp_score, health_score):
-    # Weighted combination
-    fusion_score = 0.4*gnn_score + 0.3*nlp_score + 0.3*(1 - health_score/100)
-    
-    # Map to RUL and failure type
-    if fusion_score < 0.2: rul = 90 days, type = "None predicted"
-    elif fusion_score < 0.4: rul = 60 days, type = "Minor wear"
-    elif fusion_score < 0.6: rul = 30 days, type = "Component degradation"
-    elif fusion_score < 0.8: rul = 14 days, type = "Bearing failure likely"
-    else: rul = 7 days, type = "Imminent failure"
-```
+---
 
 ## 🚀 Getting Started
 
@@ -259,24 +371,25 @@ yarn start
 # App runs on http://localhost:3000
 ```
 
-### Load Demo Data
+### Quick Start
 1. Open the application
-2. Click "Load Demo Data" in the sidebar
-3. This creates 5 demo machines with:
-   - 90 days of simulated sensor data
-   - Maintenance logs with risk keywords
-   - Various health states (healthy, warning, critical)
+2. Create an account (Sign Up)
+3. Click "Load Demo Data"
+4. Explore the dashboard
+5. Click "Run Prediction" for GNN analysis
 
-### Upload Custom Data
-Supported formats: **CSV** and **JSON**
+---
 
-CSV format:
+## 📊 Data Formats
+
+### CSV Upload
 ```csv
 timestamp,machine_id,temperature,pressure,vibration,rpm
 2024-01-01T00:00:00,machine-1,45.2,102.5,0.52,3050
+2024-01-01T01:00:00,machine-1,46.1,101.8,0.55,3020
 ```
 
-JSON format:
+### JSON Upload
 ```json
 [
   {
@@ -290,111 +403,76 @@ JSON format:
 ]
 ```
 
-## 📦 Tech Stack
+---
 
-### Backend
-| Library | Purpose |
-|---------|---------|
-| FastAPI | REST API framework |
-| MongoDB + Motor | Async database |
-| PyTorch | Deep learning framework |
-| PyTorch Geometric | GNN models (GCN, GAT) |
-| scipy | Statistical computations |
-| networkx | Graph algorithms |
-| scikit-learn | ML utilities |
-| sentence-transformers | NLP embeddings |
-| SendGrid | Email notifications |
-
-### Frontend
-| Library | Purpose |
-|---------|---------|
-| React 19 | UI framework |
-| Tailwind CSS | Styling |
-| Recharts | Time-series charts |
-| react-force-graph-2d | Graph visualization |
-| Framer Motion | Animations |
-| socket.io-client | WebSocket connection |
-| Lucide React | Icons |
-| shadcn/ui | UI components |
-
-## 🔔 Alert System
-
-The system monitors machine health and triggers alerts based on configurable thresholds:
-
-| Health Score | Risk Level | Action |
-|--------------|------------|--------|
-| > 70% | Healthy | No alert |
-| 40-70% | Warning | Yellow alert |
-| < 40% | Critical | Red alert + optional email |
-
-### Configuring Alerts
-
-1. Go to **Alerts** tab in sidebar
-2. Click **Alert Settings**
-3. Configure:
-   - Email notifications toggle
-   - Email recipients list
-   - Critical threshold (default: 40%)
-   - Warning threshold (default: 70%)
-
-### Email Alerts (Optional)
-
-To enable email alerts, add to `/app/backend/.env`:
-```bash
-SENDGRID_API_KEY=your_sendgrid_api_key
-SENDER_EMAIL=alerts@yourdomain.com
-```
-
-## 🌐 WebSocket Real-time Streaming
-
-The system streams live sensor data every 5 seconds when viewing a machine:
+## 🗂️ Project Structure
 
 ```
-Live Sensors → WebSocket → Buffer
-                          ↓
-                  Graph Builder
-                          ↓
-                      GNN
-                          ↓
-                 Fusion + NLP
-                          ↓
-                 Health Score
-                          ↓
-        Dashboard + Alert Engine
+/app/
+├── backend/
+│   ├── server.py           # Main FastAPI application
+│   ├── gnn_training.py     # GNN training script
+│   ├── requirements.txt    # Python dependencies
+│   ├── .env               # Environment variables
+│   ├── data/              # CMAPSS training data
+│   │   └── train_FD001.csv
+│   └── models/            # Trained model weights
+│       ├── gcn_cmapss.pt
+│       └── gat_cmapss.pt
+│
+├── frontend/
+│   ├── src/
+│   │   ├── App.js                    # Main application
+│   │   ├── components/
+│   │   │   ├── AuthPage.jsx          # Login/Register
+│   │   │   ├── Sidebar.jsx           # Navigation
+│   │   │   ├── HealthDashboard.jsx   # Overview
+│   │   │   ├── SensorTimeSeries.jsx  # Charts
+│   │   │   ├── FailurePrediction.jsx # Predictions
+│   │   │   ├── GraphVisualization.jsx # GNN graph
+│   │   │   ├── MaintenanceLogs.jsx   # NLP logs
+│   │   │   └── AlertsPanel.jsx       # Alerts
+│   │   └── hooks/
+│   │       └── useWebSocket.js       # Real-time hook
+│   ├── package.json
+│   └── .env
+│
+└── README.md
 ```
 
-WebSocket endpoint: `wss://your-domain/ws/{machine_id}`
+---
 
-## 🔮 Future Enhancements
+## 🔮 Roadmap
 
-### Completed in v2.0 ✅
-- [x] PyTorch Geometric GCN/GAT models
-- [x] Real-time WebSocket sensor streaming
+### Completed ✅
+- [x] JWT authentication
+- [x] Multi-tenant data isolation
+- [x] PyTorch Geometric GCN/GAT
+- [x] Real-time WebSocket streaming
 - [x] Alert notification system
 - [x] SendGrid email integration
 
-### P2 - Medium Priority
-- [ ] User authentication system
+### Coming Soon
+- [ ] Train GNN on full NASA CMAPSS dataset
 - [ ] Historical prediction accuracy tracking
 - [ ] Export reports to PDF
-- [ ] Mobile-responsive improvements
-- [ ] Train GNN on real failure datasets
-
-### P3 - Future
-- [ ] Dynamic temporal graphs
-- [ ] Comparison with baseline ML models (LSTM, Random Forest)
-- [ ] Integration with industrial IoT platforms (OPC-UA, MQTT)
+- [ ] Role-based access control (Admin/Operator/Viewer)
 - [ ] SMS alerts via Twilio
+- [ ] Integration with industrial IoT platforms
+
+---
 
 ## 📄 License
 
 MIT License - Feel free to use and modify for your projects.
 
+---
+
 ## 🙏 Acknowledgments
 
 - NASA Turbofan (CMAPSS) dataset for inspiration
 - PyTorch Geometric team for GNN implementations
-- Hugging Face for SentenceTransformers
+- Hugging Face for NLP research
 
 ---
 
