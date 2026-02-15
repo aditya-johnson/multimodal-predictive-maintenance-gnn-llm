@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { Toaster, toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
-import { Bell, LogOut, User } from "lucide-react";
+import { Bell, LogOut, User, Building2, FileDown, ChevronDown } from "lucide-react";
 
 import { AuthPage } from "./components/AuthPage";
 import { Sidebar } from "./components/Sidebar";
@@ -12,15 +12,24 @@ import { FailurePrediction } from "./components/FailurePrediction";
 import { GraphVisualization } from "./components/GraphVisualization";
 import { MaintenanceLogs } from "./components/MaintenanceLogs";
 import { AlertsPanel } from "./components/AlertsPanel";
+import { OrganizationManager } from "./components/OrganizationManager";
 import { useWebSocket } from "./hooks/useWebSocket";
 import { Button } from "./components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "./components/ui/dropdown-menu";
 
 import "@/App.css";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
-// Configure axios defaults
+// Configure axios
 axios.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
   if (token) {
@@ -35,6 +44,7 @@ axios.interceptors.response.use(
     if (error.response?.status === 401) {
       localStorage.removeItem("token");
       localStorage.removeItem("user");
+      localStorage.removeItem("org");
       window.location.reload();
     }
     return Promise.reject(error);
@@ -44,33 +54,41 @@ axios.interceptors.response.use(
 function App() {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
+  const [currentOrg, setCurrentOrg] = useState(null);
+  const [userRole, setUserRole] = useState(null);
   const [machines, setMachines] = useState([]);
   const [selectedMachine, setSelectedMachine] = useState(null);
   const [activeTab, setActiveTab] = useState("dashboard");
   const [loading, setLoading] = useState(true);
   const [dashboardSummary, setDashboardSummary] = useState(null);
   const [alerts, setAlerts] = useState([]);
+  const [downloadingReport, setDownloadingReport] = useState(false);
 
   // Check for existing session
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
     const storedUser = localStorage.getItem("user");
+    const storedOrg = localStorage.getItem("org");
     
     if (storedToken && storedUser) {
       setToken(storedToken);
       setUser(JSON.parse(storedUser));
+      if (storedOrg) {
+        const org = JSON.parse(storedOrg);
+        setCurrentOrg(org);
+        setUserRole(org.role);
+      }
     }
     setLoading(false);
   }, []);
 
-  // WebSocket for real-time updates
+  // WebSocket
   const { lastMessage, isConnected } = useWebSocket(
     selectedMachine?.id && token
       ? `${BACKEND_URL.replace('https://', 'wss://').replace('http://', 'ws://')}/ws/${selectedMachine.id}`
       : null
   );
 
-  // Handle WebSocket messages
   useEffect(() => {
     if (lastMessage) {
       if (lastMessage.type === "sensor_update") {
@@ -79,7 +97,6 @@ function App() {
             ? { ...m, health_score: lastMessage.health_score, failure_probability: lastMessage.failure_probability, risk_level: lastMessage.risk_level }
             : m
         ));
-        
         if (selectedMachine) {
           setSelectedMachine(prev => ({
             ...prev,
@@ -89,19 +106,17 @@ function App() {
           }));
         }
       } else if (lastMessage.type === "alert") {
-        const alert = lastMessage.data;
-        toast.error(`${alert.alert_type}: ${alert.machine_name}`, {
-          description: alert.message,
+        toast.error(`${lastMessage.data.alert_type}: ${lastMessage.data.machine_name}`, {
+          description: lastMessage.data.message,
           duration: 10000
         });
-        setAlerts(prev => [alert, ...prev]);
         fetchAlerts();
       }
     }
   }, [lastMessage, selectedMachine]);
 
   const fetchMachines = useCallback(async () => {
-    if (!token) return;
+    if (!token || !currentOrg) return;
     try {
       const response = await axios.get(`${API}/machines`);
       setMachines(response.data);
@@ -111,10 +126,10 @@ function App() {
     } catch (error) {
       console.error("Error fetching machines:", error);
     }
-  }, [token, selectedMachine]);
+  }, [token, currentOrg, selectedMachine]);
 
   const fetchDashboardSummary = async () => {
-    if (!token) return;
+    if (!token || !currentOrg) return;
     try {
       const response = await axios.get(`${API}/dashboard/summary`);
       setDashboardSummary(response.data);
@@ -124,7 +139,7 @@ function App() {
   };
 
   const fetchAlerts = async () => {
-    if (!token) return;
+    if (!token || !currentOrg) return;
     try {
       const response = await axios.get(`${API}/alerts?limit=20&unacknowledged_only=true`);
       setAlerts(response.data);
@@ -149,12 +164,12 @@ function App() {
     try {
       toast.loading("Seeding demo data...", { id: "seed" });
       await axios.post(`${API}/seed-demo`);
-      toast.success("Demo data loaded successfully!", { id: "seed" });
+      toast.success("Demo data loaded!", { id: "seed" });
       await fetchMachines();
       await fetchDashboardSummary();
       await fetchAlerts();
     } catch (error) {
-      toast.error("Failed to seed demo data", { id: "seed" });
+      toast.error(error.response?.data?.detail || "Failed to seed demo data", { id: "seed" });
     } finally {
       setLoading(false);
     }
@@ -173,24 +188,62 @@ function App() {
     }
   };
 
+  const downloadReport = async (machineId, days = 30) => {
+    setDownloadingReport(true);
+    try {
+      toast.loading("Generating PDF report...", { id: "report" });
+      const response = await axios.get(`${API}/machines/${machineId}/report?days=${days}`, {
+        responseType: 'blob'
+      });
+      
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      const machine = machines.find(m => m.id === machineId);
+      link.setAttribute('download', `${machine?.name || 'Machine'}_Report.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+      
+      toast.success("Report downloaded!", { id: "report" });
+    } catch (error) {
+      toast.error("Failed to generate report", { id: "report" });
+    } finally {
+      setDownloadingReport(false);
+    }
+  };
+
   const handleLogin = (userData, accessToken) => {
     setUser(userData);
     setToken(accessToken);
+    localStorage.setItem("token", accessToken);
+    localStorage.setItem("user", JSON.stringify(userData));
+  };
+
+  const handleOrgChange = (org, role) => {
+    setCurrentOrg(org);
+    setUserRole(role);
+    localStorage.setItem("org", JSON.stringify({ ...org, role }));
+    setSelectedMachine(null);
+    setMachines([]);
   };
 
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
+    localStorage.removeItem("org");
     setUser(null);
     setToken(null);
+    setCurrentOrg(null);
+    setUserRole(null);
     setMachines([]);
     setSelectedMachine(null);
-    toast.success("Logged out successfully");
+    toast.success("Logged out");
   };
 
-  // Fetch data when authenticated
   useEffect(() => {
-    if (token) {
+    if (token && currentOrg) {
       const init = async () => {
         setLoading(true);
         await fetchMachines();
@@ -200,9 +253,9 @@ function App() {
       };
       init();
     }
-  }, [token]);
+  }, [token, currentOrg]);
 
-  // Show auth page if not logged in
+  // Show auth page
   if (!token) {
     return (
       <>
@@ -212,7 +265,23 @@ function App() {
     );
   }
 
+  // Check permissions
+  const canManageMachines = ["admin", "operator"].includes(userRole);
+  const canRunPredictions = ["admin", "operator"].includes(userRole);
+  const canManageAlerts = ["admin", "operator"].includes(userRole);
+  const canManageOrg = userRole === "admin";
+
   const renderContent = () => {
+    if (!currentOrg) {
+      return (
+        <OrganizationManager
+          currentOrg={currentOrg}
+          onOrgChange={handleOrgChange}
+          API={API}
+        />
+      );
+    }
+
     switch (activeTab) {
       case "dashboard":
         return (
@@ -221,9 +290,11 @@ function App() {
             selectedMachine={selectedMachine}
             setSelectedMachine={setSelectedMachine}
             dashboardSummary={dashboardSummary}
-            onRunPrediction={runPrediction}
+            onRunPrediction={canRunPredictions ? runPrediction : null}
+            onDownloadReport={downloadReport}
             API={API}
             isStreaming={isConnected}
+            userRole={userRole}
           />
         );
       case "sensors":
@@ -239,8 +310,9 @@ function App() {
         return (
           <FailurePrediction
             selectedMachine={selectedMachine}
-            onRunPrediction={runPrediction}
+            onRunPrediction={canRunPredictions ? runPrediction : null}
             API={API}
+            userRole={userRole}
           />
         );
       case "graph":
@@ -256,13 +328,23 @@ function App() {
             selectedMachine={selectedMachine}
             machines={machines}
             API={API}
+            canEdit={canManageMachines}
           />
         );
       case "alerts":
         return (
           <AlertsPanel
             alerts={alerts}
-            onAcknowledge={acknowledgeAlert}
+            onAcknowledge={canManageAlerts ? acknowledgeAlert : null}
+            API={API}
+            userRole={userRole}
+          />
+        );
+      case "organization":
+        return (
+          <OrganizationManager
+            currentOrg={currentOrg}
+            onOrgChange={handleOrgChange}
             API={API}
           />
         );
@@ -277,11 +359,7 @@ function App() {
         theme="dark" 
         position="top-right"
         toastOptions={{
-          style: {
-            background: '#18181b',
-            border: '1px solid #27272a',
-            color: '#e4e4e7'
-          }
+          style: { background: '#18181b', border: '1px solid #27272a', color: '#e4e4e7' }
         }}
       />
       
@@ -291,45 +369,97 @@ function App() {
         machines={machines}
         selectedMachine={selectedMachine}
         setSelectedMachine={setSelectedMachine}
-        onSeedDemo={seedDemoData}
+        onSeedDemo={canManageMachines ? seedDemoData : null}
         loading={loading}
         alertCount={alerts.length}
+        hasOrg={!!currentOrg}
+        userRole={userRole}
       />
       
       <main className="flex-1 overflow-y-auto flex flex-col">
         {/* Top Bar */}
         <div className="flex items-center justify-between px-6 py-3 border-b border-zinc-800/60 bg-zinc-900/30">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-4">
+            {currentOrg && (
+              <div className="flex items-center gap-2 text-sm text-zinc-400">
+                <Building2 className="w-4 h-4" />
+                <span>{currentOrg.name}</span>
+                {userRole && (
+                  <span className={`text-xs px-2 py-0.5 rounded ${
+                    userRole === "admin" ? "bg-yellow-950/30 text-yellow-400" :
+                    userRole === "operator" ? "bg-cyan-950/30 text-cyan-400" :
+                    "bg-zinc-800 text-zinc-400"
+                  }`}>
+                    {userRole}
+                  </span>
+                )}
+              </div>
+            )}
             {isConnected && (
               <span className="flex items-center gap-2 text-xs text-emerald-400">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                Live Streaming
+                Live
               </span>
             )}
           </div>
           
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 text-sm text-zinc-400">
-              <User className="w-4 h-4" />
-              <span>{user?.name || user?.email}</span>
-            </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleLogout}
-              className="text-zinc-400 hover:text-zinc-100"
-              data-testid="logout-btn"
-            >
-              <LogOut className="w-4 h-4 mr-2" />
-              Logout
-            </Button>
+            {/* Download Report */}
+            {selectedMachine && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="sm" className="border-zinc-700" disabled={downloadingReport}>
+                    <FileDown className="w-4 h-4 mr-2" />
+                    Report
+                    <ChevronDown className="w-3 h-3 ml-1" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="bg-zinc-900 border-zinc-800">
+                  <DropdownMenuLabel className="text-zinc-400">Download PDF Report</DropdownMenuLabel>
+                  <DropdownMenuSeparator className="bg-zinc-800" />
+                  <DropdownMenuItem onClick={() => downloadReport(selectedMachine.id, 7)} className="text-zinc-300">
+                    Last 7 Days
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => downloadReport(selectedMachine.id, 30)} className="text-zinc-300">
+                    Last 30 Days
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => downloadReport(selectedMachine.id, 90)} className="text-zinc-300">
+                    Last 90 Days
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+            
+            {/* User Menu */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="text-zinc-400 hover:text-zinc-100">
+                  <User className="w-4 h-4 mr-2" />
+                  {user?.name}
+                  <ChevronDown className="w-3 h-3 ml-1" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="bg-zinc-900 border-zinc-800" align="end">
+                <DropdownMenuLabel className="text-zinc-400">{user?.email}</DropdownMenuLabel>
+                <DropdownMenuSeparator className="bg-zinc-800" />
+                <DropdownMenuItem onClick={() => setActiveTab("organization")} className="text-zinc-300">
+                  <Building2 className="w-4 h-4 mr-2" />
+                  Organizations
+                </DropdownMenuItem>
+                <DropdownMenuSeparator className="bg-zinc-800" />
+                <DropdownMenuItem onClick={handleLogout} className="text-red-400">
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Logout
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
 
         {/* Main Content */}
         <div className="flex-1 p-6 md:p-8 overflow-y-auto">
           {/* Alert Banner */}
-          {alerts.length > 0 && activeTab !== "alerts" && (
+          {alerts.length > 0 && activeTab !== "alerts" && currentOrg && (
             <motion.div
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
