@@ -394,7 +394,82 @@ export const ComparisonDashboard = ({ API }) => {
         </CardContent>
       </Card>
 
-      {/* Panel 3: False Alerts Table */}
+      {/* Panel 3: Training History Chart */}
+      {trainingHistory && trainingHistory.length > 0 && (
+        <Card className="bg-zinc-950/50 border-zinc-800/60">
+          <CardHeader>
+            <CardTitle className="text-zinc-100 flex items-center gap-2">
+              <TrendingUp className="w-5 h-5 text-cyan-400" />
+              Training History
+            </CardTitle>
+            <CardDescription>
+              Model improvement over {trainingHistory.length} epochs on NASA CMAPSS FD001
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* F1 Score Progress */}
+              <div>
+                <h4 className="text-sm font-medium text-zinc-400 mb-3">F1 Score & Accuracy Progress</h4>
+                <ResponsiveContainer width="100%" height={250}>
+                  <LineChart data={trainingHistory}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#27272a" />
+                    <XAxis dataKey="epoch" stroke="#71717a" label={{ value: 'Epoch', position: 'bottom', fill: '#71717a' }} />
+                    <YAxis stroke="#71717a" domain={[0, 100]} unit="%" />
+                    <Tooltip
+                      contentStyle={{ background: '#18181b', border: '1px solid #27272a', borderRadius: '8px' }}
+                      labelFormatter={(v) => `Epoch ${v}`}
+                    />
+                    <Legend />
+                    <Line type="monotone" dataKey="val_f1" stroke={COLORS.gnn} strokeWidth={2} name="Val F1 Score" dot={{ fill: COLORS.gnn }} />
+                    <Line type="monotone" dataKey="train_acc" stroke="#10B981" strokeWidth={2} name="Train Accuracy" dot={{ fill: '#10B981' }} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+              
+              {/* Loss Curve */}
+              <div>
+                <h4 className="text-sm font-medium text-zinc-400 mb-3">Training Loss</h4>
+                <ResponsiveContainer width="100%" height={250}>
+                  <LineChart data={trainingHistory}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#27272a" />
+                    <XAxis dataKey="epoch" stroke="#71717a" label={{ value: 'Epoch', position: 'bottom', fill: '#71717a' }} />
+                    <YAxis stroke="#71717a" />
+                    <Tooltip
+                      contentStyle={{ background: '#18181b', border: '1px solid #27272a', borderRadius: '8px' }}
+                      labelFormatter={(v) => `Epoch ${v}`}
+                    />
+                    <Legend />
+                    <Line type="monotone" dataKey="loss" stroke="#EF4444" strokeWidth={2} name="Training Loss" dot={{ fill: '#EF4444' }} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+            
+            {/* Training Stats */}
+            <div className="grid grid-cols-4 gap-4 mt-4">
+              <div className="p-3 bg-zinc-900/50 rounded-lg text-center">
+                <p className="text-xs text-zinc-500">Final F1</p>
+                <p className="text-lg font-bold text-cyan-400">{trainingHistory[trainingHistory.length - 1].val_f1}%</p>
+              </div>
+              <div className="p-3 bg-zinc-900/50 rounded-lg text-center">
+                <p className="text-xs text-zinc-500">Peak F1</p>
+                <p className="text-lg font-bold text-emerald-400">{Math.max(...trainingHistory.map(h => h.val_f1))}%</p>
+              </div>
+              <div className="p-3 bg-zinc-900/50 rounded-lg text-center">
+                <p className="text-xs text-zinc-500">Initial Loss</p>
+                <p className="text-lg font-bold text-red-400">{trainingHistory[0].loss}</p>
+              </div>
+              <div className="p-3 bg-zinc-900/50 rounded-lg text-center">
+                <p className="text-xs text-zinc-500">Final Loss</p>
+                <p className="text-lg font-bold text-yellow-400">{trainingHistory[trainingHistory.length - 1].loss}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Panel 4: False Alerts Table */}
       <Card className="bg-zinc-950/50 border-zinc-800/60">
         <CardHeader>
           <CardTitle className="text-zinc-100 flex items-center gap-2">
