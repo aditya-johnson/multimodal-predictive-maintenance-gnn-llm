@@ -13,6 +13,7 @@ import { GraphVisualization } from "./components/GraphVisualization";
 import { MaintenanceLogs } from "./components/MaintenanceLogs";
 import { AlertsPanel } from "./components/AlertsPanel";
 import { OrganizationManager } from "./components/OrganizationManager";
+import { ComparisonDashboard } from "./components/ComparisonDashboard";
 import { useWebSocket } from "./hooks/useWebSocket";
 import { Button } from "./components/ui/button";
 import {
