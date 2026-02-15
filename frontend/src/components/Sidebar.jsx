@@ -102,7 +102,7 @@ export const Sidebar = ({
 
       {/* Navigation */}
       <nav className="p-2">
-        {navItems.map((item) => {
+        {visibleNavItems.map((item) => {
           const Icon = item.icon;
           const isActive = activeTab === item.id;
           const showBadge = item.id === "alerts" && alertCount > 0;
