@@ -55,9 +55,19 @@ export const Sidebar = ({
   setSelectedMachine,
   onSeedDemo,
   loading,
-  alertCount = 0
+  alertCount = 0,
+  hasOrg = false,
+  userRole = null
 }) => {
   const [collapsed, setCollapsed] = useState(false);
+
+  // Filter nav items based on organization status
+  const visibleNavItems = navItems.filter(item => {
+    // Show organization tab always for switching/creating
+    if (item.id === "organization") return true;
+    // Other tabs require an organization
+    return hasOrg;
+  });
 
   return (
     <motion.aside
