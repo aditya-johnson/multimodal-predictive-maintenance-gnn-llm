@@ -27,6 +27,7 @@ const navItems = [
   { id: "graph", label: "Sensor Graph", icon: Network },
   { id: "logs", label: "Maintenance Logs", icon: FileText },
   { id: "alerts", label: "Alerts", icon: Bell },
+  { id: "comparison", label: "Model Comparison", icon: BarChart3 },
   { id: "organization", label: "Organization", icon: Building2 }
 ];
 
