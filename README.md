@@ -665,6 +665,56 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
+## 📊 Dataset
+
+This project uses the **NASA CMAPSS (Commercial Modular Aero-Propulsion System Simulation)** dataset for turbofan engine degradation simulation.
+
+### Official Sources
+
+| Source | Link |
+|--------|------|
+| **NASA Open Data Portal** | [https://data.nasa.gov/dataset/cmapss-jet-engine-simulated-data](https://data.nasa.gov/dataset/cmapss-jet-engine-simulated-data) |
+| **Direct Download (CMAPSSData.zip)** | [NASA Data Resource](https://data.nasa.gov/dataset/cmapss-jet-engine-simulated-data/resource/5224bcd1-ad61-490b-93b9-2817288accb8) |
+| **NASA Prognostics Center** | [https://www.nasa.gov/intelligent-systems-division/discovery-and-systems-health/pcoe/pcoe-data-set-repository/](https://www.nasa.gov/intelligent-systems-division/discovery-and-systems-health/pcoe/pcoe-data-set-repository/) |
+
+### Alternative Sources (Mirrors)
+
+| Source | Link |
+|--------|------|
+| **Kaggle** | [https://www.kaggle.com/datasets/behrad3d/nasa-cmaps](https://www.kaggle.com/datasets/behrad3d/nasa-cmaps) |
+| **GitHub Mirror** | [https://github.com/hankroark/Turbofan-Engine-Degradation](https://github.com/hankroark/Turbofan-Engine-Degradation) |
+
+### Dataset Description
+
+The CMAPSS dataset contains run-to-failure simulations of turbofan engines under different operating conditions and fault modes:
+
+| Dataset | Engines (Train) | Engines (Test) | Operating Conditions | Fault Modes |
+|---------|-----------------|----------------|---------------------|-------------|
+| **FD001** | 100 | 100 | 1 | 1 (HPC Degradation) |
+| **FD002** | 260 | 259 | 6 | 1 (HPC Degradation) |
+| **FD003** | 100 | 100 | 1 | 2 (HPC + Fan Degradation) |
+| **FD004** | 249 | 248 | 6 | 2 (HPC + Fan Degradation) |
+
+Each engine starts with different degrees of initial wear and manufacturing variation. The engine operates normally at the start and develops a fault at some point. The fault grows in magnitude until system failure.
+
+### Data Format
+
+Each row contains:
+- `unit` - Engine unit number
+- `cycle` - Time cycle
+- `setting1-3` - Operational settings
+- `s1-s21` - 21 sensor measurements
+
+### Citation
+
+If you use this dataset, please cite:
+```
+A. Saxena, K. Goebel, D. Simon, and N. Eklund, "Damage Propagation Modeling for Aircraft Engine Run-to-Failure Simulation", 
+International Conference on Prognostics and Health Management, 2008.
+```
+
+---
+
 ## 🙏 Acknowledgments
 
 - **NASA** - CMAPSS Turbofan Engine Degradation Simulation Dataset
